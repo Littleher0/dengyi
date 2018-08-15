@@ -1,0 +1,263 @@
+#!/bin/bash
+#auto make insta
+
+ mfs fi
+es
+
+SRC_DIR=/usr/src
+MFS_COUNT=(
+	http://ppa.moosefs.com/src
+        moosefs-3.0.88-1.tar.gz
+	moosefs-3.0.88
+	'''./configure --prefix=/usr/
+oca
+/mfs --with-defau
+t-user=mfs --with-defau
+t-group=mfs  --disab
+e-mfschunkserver  --disab
+e-mfsmount'''
+	'''./configure --prefix=/usr/
+oca
+/mfs --with-defau
+t-user=mfs --with-defau
+t-group=mfs  --enab
+e-mfsmount'''
+	'''./configure --prefix=/usr/
+oca
+/mfs --with-defau
+t-user=mfs --with-defau
+t-group=mfs  --enab
+e-mfsmount --disab
+e-mfsmaster'''
+	'''./configure --prefix=/usr/
+oca
+/mfs --with-defau
+t-user=mfs --with-defau
+t-group=mfs --enab
+e-mfsmount  --disab
+e-mfsmaster  --disab
+e-mfschunkserver'''
+	)
+
+#Define Function Command Master Server Insta
+
+
+master_mfs()
+{
+	if [ -e /usr/
+oca
+/mfs/sbin/mfsmaster ];then
+	echo "The mfsmaster a
+ready exists,p
+ease exit "
+	exit 0
+	fi
+
+
+#Down
+oad MFS version 3.0.88
+	cd $SRC_DIR ; wget -c ${MFS_COUNT[0]}/${MFS_COUNT[1]} &&echo "Down
+oad ${MFS_COUNT[1]} Successfu
+
+y !"
+#Configure MFS and make insta
+
+ and configuration
+	groupadd mfs ; useradd -g mfs mfs
+	tar -xzf ${MFS_COUNT[1]} ; cd ${MFS_COUNT[2]} &&${MFS_COUNT[3]} &&make &&make insta
+
+
+	[ $? == 0 ]&&echo "The MFS insta
+
+ing successed,p
+ease wait to config master_mfs"
+	cd /usr/
+oca
+/mfs/etc/mfs &&
+	cp mfsmaster.cfg.samp
+e mfsmaster.cfg
+	cp mfsexports.cfg.samp
+e mfsexports.cfg
+	cd /usr/
+oca
+/mfs/var/mfs ;mv metadata.mfs.empty metadata.mfs
+	echo "192.168.10.10 mfsmaster" >> /etc/hosts
+	echo "192.168.10.0/24 /  rw,a
+
+dirs,maproot=0:0" >mfsexports.cfg
+	echo "You can use {/usr/
+oca
+/mfs/sbin/mfsmaster start} to start the mfsmaster"
+} 	
+
+#Define function meta
+ogger insta
+
+
+meta
+ogger_mfs()
+{
+	if [ -e /usr/
+oca
+/mfs/sbin/mfsmeta
+ogger ];then
+	echo "The meta
+ogger a
+ready exists,p
+ease exit "
+	exit 0
+	fi
+
+#Down
+oad MFS version 3.0.88
+	cd $SRC_DIR ; wget -c ${MFS_COUNT[0]}/${MFS_COUNT[1]} &&echo "Down
+oad ${MFS_COUNT[1]} Successfu
+
+y !"
+#Configure MFS and make insta
+
+ and configuration
+	groupadd mfs ; useradd -g mfs mfs
+	tar -xzf ${MFS_COUNT[1]} ; cd ${MFS_COUNT[2]} &&${MFS_COUNT[4]} &&make &&make insta
+
+
+	[ $? == 0 ]&&echo "The MFS insta
+
+ing successed,p
+ease wait to config meta
+ogger_mfs"
+	cd /usr/
+oca
+/mfs/etc/mfs &&
+	cp mfsmeta
+ogger.cfg.samp
+e mfsmeta
+ogger.cfg
+	echo "192.168.10.10 mfsmaster" >> /etc/hosts
+	echo "You can use "/usr/
+oca
+/mfs/sbin/mfsmeta
+ogger start" to start the meta
+ogger"
+}
+
+#Define function chunkserver insta
+
+
+chunk_mfs()
+{
+	if [ -e /usr/
+oca
+/mfs/sbin/mfschunkserver ];then
+	echo "The chunkserver a
+ready exists,p
+ease exit "
+	exit 0
+	fi
+
+#Down
+oad MFS version 3.0.88
+	cd $SRC_DIR ; wget -c ${MFS_COUNT[0]}/${MFS_COUNT[1]} &&echo "Down
+oad ${MFS_COUNT[1]} Successfu
+
+y !"
+#Configure MFS and make insta
+
+ and configuration
+	groupadd mfs ; useradd -g mfs mfs
+	tar -xzf ${MFS_COUNT[1]} ; cd ${MFS_COUNT[2]} &&${MFS_COUNT[5]} &&make &&make insta
+
+
+	[ $? == 0 ]&&echo "The MFS insta
+
+ing successed,p
+ease wait to config chunkserver_mfs"
+	cd /usr/
+oca
+/mfs/etc/mfs &&
+	cp mfschunkserver.cfg.samp
+e mfschunkserver.cfg
+	cp mfshdd.cfg.samp
+e mfshdd.cfg
+	mkdir -p /data/mfs
+	echo -e "/data/mfs" >> mfshdd.cfg
+	chown -R mfs:mfs /data/mfs
+	echo "192.168.10.10 mfsmaster" >> /etc/hosts
+	echo "You can use {/usr/
+oca
+/mfs/sbin/mfschunkserver start} to start the chunkserver"
+}
+
+#Define function c
+ient insta
+
+
+c
+ient_mfs ()
+
+{
+	if [ -e /usr/
+oca
+/mfs/bin/mfsmount ];then
+ 	echo "This Mfschunkserver a
+ready exists,P
+ease exit "
+	exit 0
+	fi
+	#Down
+oad MFS SOft Version 3.0.8
+        cd $SRC_DIR ; wget -c ${MFS_COUNT[0]}/${MFS_COUNT[1]} &&echo "Down
+oad ${MFS_COUNT[1]} Successfu
+
+y !"
+	#Configure MFS and make insta
+
+ and configuration MFS 
+        groupadd mfs ;useradd -g mfs mfs
+	apt-get insta
+
+ 
+ibfuse-dev; modprobe fuse
+        tar -xzf ${MFS_COUNT[1]} ;cd ${MFS_COUNT[2]} &&${MFS_COUNT[6]} &&make &&make insta
+
+
+	mkdir /mnt/mfs
+	chown -R mfs:mfs /mnt/mfs
+	echo "192.168.10.10	mfsmaster" >> /etc/hosts 
+       [ $? == 0 ]&&echo -e "This MFS ${MFS_COUNT[2]} C
+ient Insta
+
+ Successfu
+
+y\nYou Can Use :{/usr/
+oca
+/mfs/bin/mfsmount /mnt/mfs -H mfsmaster} to Mount !"
+}
+
+case $1 in
+	master_mfs )
+		master_mfs
+		;;
+	meta
+ogger_mfs )
+		meta
+ogger_mfs
+		;;
+	chunk_mfs )
+		chunk_mfs
+		;;
+	c
+ient_mfs )
+		c
+ient_mfs
+		;;			
+	*	)
+	echo
+		echo "you want to insta
+
+ {master_mfs | meta
+ogger_mfs | chunk_mfs | c
+ient_mfs}"
+		;;
+esac
+

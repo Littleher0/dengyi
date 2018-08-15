@@ -1,0 +1,120 @@
+#!/bin/bash
+#auto make install mfs files
+
+SRC_DIR=/usr/src
+MFS_COUNT=(
+	http://ppa.moosefs.com/src
+        moosefs-3.0.88-1.tar.gz
+	moosefs-3.0.88
+	'''./configure --prefix=/usr/local/mfs --with-default-user=mfs --with-default-group=mfs  --disable-mfschunkserver  --disable-mfsmount'''
+	'''./configure --prefix=/usr/local/mfs --with-default-user=mfs --with-default-group=mfs  --enable-mfsmount'''
+	'''./configure --prefix=/usr/local/mfs --with-default-user=mfs --with-default-group=mfs  --enable-mfsmount --disable-mfsmaster'''
+	'''./configure --prefix=/usr/local/mfs --with-default-user=mfs --with-default-group=mfs --enable-mfsmount  --disable-mfsmaster  --disable-mfschunkserver'''
+	)
+
+#Define Function Command Master Server Install
+master_mfs()
+{
+	if [ -e /usr/local/mfs/sbin/mfsmaster ];then
+	echo "The mfsmaster already exists,please exit "
+	exit 0
+	fi
+
+
+#Download MFS version 3.0.88
+	cd $SRC_DIR ; wget -c ${MFS_COUNT[0]}/${MFS_COUNT[1]} &&echo "Download ${MFS_COUNT[1]} Successfully !"
+#Configure MFS and make install and configuration
+	groupadd mfs ; useradd -g mfs mfs
+	tar -xzf ${MFS_COUNT[1]} ; cd ${MFS_COUNT[2]} &&${MFS_COUNT[3]} &&make &&make install
+	[ $? == 0 ]&&echo "The MFS installing successed,please wait to config master_mfs"
+	cd /usr/local/mfs/etc/mfs &&
+	cp mfsmaster.cfg.sample mfsmaster.cfg
+	cp mfsexports.cfg.sample mfsexports.cfg
+	cd /usr/local/mfs/var/mfs ;mv metadata.mfs.empty metadata.mfs
+	echo "192.168.10.10 mfsmaster" >> /etc/hosts
+	echo "192.168.10.0/24 /  rw,alldirs,maproot=0:0" >mfsexports.cfg
+	echo "You can use {/usr/local/mfs/sbin/mfsmaster start} to start the mfsmaster"
+} 	
+
+#Define function metalogger install
+metalogger_mfs()
+{
+	if [ -e /usr/local/mfs/sbin/mfsmetalogger ];then
+	echo "The metalogger already exists,please exit "
+	exit 0
+	fi
+
+#Download MFS version 3.0.88
+	cd $SRC_DIR ; wget -c ${MFS_COUNT[0]}/${MFS_COUNT[1]} &&echo "Download ${MFS_COUNT[1]} Successfully !"
+#Configure MFS and make install and configuration
+	groupadd mfs ; useradd -g mfs mfs
+	tar -xzf ${MFS_COUNT[1]} ; cd ${MFS_COUNT[2]} &&${MFS_COUNT[4]} &&make &&make install
+	[ $? == 0 ]&&echo "The MFS installing successed,please wait to config metalogger_mfs"
+	cd /usr/local/mfs/etc/mfs &&
+	cp mfsmetalogger.cfg.sample mfsmetalogger.cfg
+	echo "192.168.10.10 mfsmaster" >> /etc/hosts
+	echo "You can use "/usr/local/mfs/sbin/mfsmetalogger start" to start the metalogger"
+}
+
+#Define function chunkserver install
+chunk_mfs()
+{
+	if [ -e /usr/local/mfs/sbin/mfschunkserver ];then
+	echo "The chunkserver already exists,please exit "
+	exit 0
+	fi
+
+#Download MFS version 3.0.88
+	cd $SRC_DIR ; wget -c ${MFS_COUNT[0]}/${MFS_COUNT[1]} &&echo "Download ${MFS_COUNT[1]} Successfully !"
+#Configure MFS and make install and configuration
+	groupadd mfs ; useradd -g mfs mfs
+	tar -xzf ${MFS_COUNT[1]} ; cd ${MFS_COUNT[2]} &&${MFS_COUNT[5]} &&make &&make install
+	[ $? == 0 ]&&echo "The MFS installing successed,please wait to config chunkserver_mfs"
+	cd /usr/local/mfs/etc/mfs &&
+	cp mfschunkserver.cfg.sample mfschunkserver.cfg
+	cp mfshdd.cfg.sample mfshdd.cfg
+	mkdir -p /data/mfs
+	echo -e "/data/mfs" >> mfshdd.cfg
+	chown -R mfs:mfs /data/mfs
+	echo "192.168.10.10 mfsmaster" >> /etc/hosts
+	echo "You can use {/usr/local/mfs/sbin/mfschunkserver start} to start the chunkserver"
+}
+
+#Define function client install
+client_mfs ()
+
+{
+	if [ -e /usr/local/mfs/bin/mfsmount ];then
+ 	echo "This Mfschunkserver already exists,Please exit "
+	exit 0
+	fi
+	#Download MFS SOft Version 3.0.8
+        cd $SRC_DIR ; wget -c ${MFS_COUNT[0]}/${MFS_COUNT[1]} &&echo "Download ${MFS_COUNT[1]} Successfully !"
+	#Configure MFS and make install and configuration MFS 
+        groupadd mfs ;useradd -g mfs mfs
+	apt-get install libfuse-dev; modprobe fuse
+        tar -xzf ${MFS_COUNT[1]} ;cd ${MFS_COUNT[2]} &&${MFS_COUNT[6]} &&make &&make install
+	mkdir /mnt/mfs
+	chown -R mfs:mfs /mnt/mfs
+	echo "192.168.10.10	mfsmaster" >> /etc/hosts 
+       [ $? == 0 ]&&echo -e "This MFS ${MFS_COUNT[2]} Client Install Successfully\nYou Can Use :{/usr/local/mfs/bin/mfsmount /mnt/mfs -H mfsmaster} to Mount !"
+}
+
+case $1 in
+	master_mfs )
+		master_mfs
+		;;
+	metalogger_mfs )
+		metalogger_mfs
+		;;
+	chunk_mfs )
+		chunk_mfs
+		;;
+	client_mfs )
+		client_mfs
+		;;			
+	*	)
+	echo
+		echo "you want to install {master_mfs | metalogger_mfs | chunk_mfs | client_mfs}"
+		;;
+esac
