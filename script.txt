@@ -11,6 +11,15 @@ MFS_COUNT=(
 	'''./configure --prefix=/usr/local/mfs --with-default-user=mfs --with-default-group=mfs  --enable-mfsmount --disable-mfsmaster'''
 	'''./configure --prefix=/usr/local/mfs --with-default-user=mfs --with-default-group=mfs --enable-mfsmount  --disable-mfsmaster  --disable-mfschunkserver'''
 	)
+MFS_COUNT=(
+	http://ppa.moosefs.com/src
+        moosefs-3.0.88-1.tar.gz
+	moosefs-3.0.88
+	'''./configure --prefix=/usr/local/mfs --with-default-user=mfs --with-default-group=mfs  --disable-mfschunkserver  --disable-mfsmount'''
+	'''./configure --prefix=/usr/local/mfs --with-default-user=mfs --with-default-group=mfs  --enable-mfsmount'''
+	'''./configure --prefix=/usr/local/mfs --with-default-user=mfs --with-default-group=mfs  --enable-mfsmount --disable-mfsmaster'''
+	'''./configure --prefix=/usr/local/mfs --with-default-user=mfs --with-default-group=mfs --enable-mfsmount  --disable-mfsmaster  --disable-mfschunkserver'''
+	)
 
 #Define Function Command Master Server Install
 master_mfs()
