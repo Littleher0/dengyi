@@ -3,7 +3,7 @@
 
  mfs fi
 es
-
+hello
 SRC_DIR=/usr/src
 MFS_COUNT=(
 	http://ppa.moosefs.com/src
